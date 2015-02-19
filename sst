@@ -1,0 +1,41 @@
+#!/bin/sh
+
+#donne toujours sont path absolu 
+# - aliasé 
+# - sourcé 
+# - symlink
+# - multiple symlink 
+# - espaces blanc dans le path 
+# - Utilisateur change le nom du script 
+# - Compatible gnu + BSD
+#
+# Bonus
+#  - Appelé via une redirection
+#  - paramétrable pour résoudre ou pas les symlinks
+#  - Est une fonction
+
+SCRIPT_DIR="$( cd -P "$( dirname "$0" )" && pwd )"
+SCRIPT_NAME=$(basename $0)
+SCRIPT_FPATH="$SCRIPT_DIR/$SCRIPT_NAME"
+CURRENT_DIR=`pwd`
+
+_readlink () {
+  target=$1
+  parts=$(ls -l "$target" )
+}
+
+whoami () {
+ fpath=$1
+ if [ -L $fpath ]
+ then
+   echo 'is a goddamn symlink'
+   t_link=_readlink $fpath
+   whoami $t_link
+ else
+   echo 'is not a symlink'
+   break
+ fi
+
+}
+
+whoami $SCRIPT_FPATH
